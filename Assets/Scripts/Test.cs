@@ -1,9 +1,15 @@
+using System;
 using UD.Globals;
 using UD.Services.InputSystem;
 using UnityEngine;
 
 public class Test : MonoBehaviour
 {
+    private void OnEnable()
+    {
+        
+    }
+
     private void OnGUI()
     {
         var input = Global.GetService<InputManager>();

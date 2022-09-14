@@ -1,0 +1,28 @@
+string	string	string	bool
+Joystick	Xbox	Ps4	IsAxis
+虚拟杆按键	Xbox 按键	Ps4 按键	是否是轴
+joystick button 0	A	Square	0
+joystick button 1	B	Cross	0
+joystick button 2	X	Circle	0
+joystick button 3	Y	Triangle	0
+joystick button 4	LB	L1	0
+joystick button 5	RB	R1	0
+joystick button 6	View	L2	0
+joystick button 7	Menu	R2	0
+joystick button 8	LeftStickClick	Share	0
+joystick button 9	RightStickClick	Option	0
+joystick button 10		LeftStickClick	0
+joystick button 11		RightStickClick	0
+joystick button 12		PlayStation	0
+joystick button 13		TouchPad	0
+x axis	LeftStickHorizontal	LeftStickHorizontal	1
+y axis	LeftStickVertical	LeftStickVertical	1
+3rd axis	Triggers	RightStickHorizontal	1
+4th axis	RightStickHorizontal	RightStickVertical	1
+5th axis	RightStickVertical		1
+6th axis	D-Pad Horizontal		1
+4th axis	D-Pad Vertical		1
+7th axis		D-Pad Horizontal	1
+8th axis		D-Pad Vertical	1
+9th axis	LT		1
+10th axis	RT		1

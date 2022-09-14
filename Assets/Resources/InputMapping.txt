@@ -1,22 +1,22 @@
-string	string	string	string	bool
-buttonName	keyboard	joystick	mobile	IsAxis
-按钮名称	键盘按键名	摇杆按键名	手机按键名	是否是轴
-Horizontal	Horizontal	LeftAnalogHorizontal	Horizontal	1
-Vertical	Vertical	LeftAnalogVertical	Vertical	1
-Mouse X	Mouse X	RightAnalogHorizontal	Mouse X	1
-Mouse Y	Mouse Y	RightAnalogVertical	Mouse Y	1
-HorizontalArrow	HorizontalArrow	D-Pad Horizontal	HorizontalArrow	1
-VerticalArrow	VerticalArrow	D-Pad Vertical	VerticalArrow	0
-Button0	Alpha0	A	Button0	0
-Button1	Alpha1	B	Button1	0
-Button2	Alpha2	X	Button2	0
-Button3	Alpha3	Y	Button3	0
-Button4	Alpha4	LB	Button4	0
-Button5	Alpha5	RB	Button5	0
-Button6	Alpha6	Back	Button6	0
-Button7	Alpha7	Start	Button7	0
-Button8	Alpha8	LT	Button8	1
-Button9	Alpha9	RT	Button9	1
-Button10	Return	Triggers	Button10	1
-LeftStickClick	Q	LeftStickClick	LeftStickClick	0
-RightStickClick	E	RightStickClick	RightStickClick	0
+string	string	string	string	string
+ButtonName	Keyboard	Xbox	Ps4	Mobile
+按钮名称	键盘按键名	Xbox 手柄按键名	Ps4 手柄按键名	手机按键名
+Horizontal	Horizontal	LeftStickHorizontal	LeftStickHorizontal	Horizontal
+Vertical	Vertical	LeftStickVertical	LeftStickVertical	Vertical
+Mouse X	Mouse X	RightStickHorizontal	RightStickHorizontal	Mouse X
+Mouse Y	Mouse Y	RightStickVertical	RightStickVertical	Mouse Y
+HorizontalArrow	HorizontalArrow	D-Pad Horizontal	D-Pad Horizontal	HorizontalArrow
+VerticalArrow	VerticalArrow	D-Pad Vertical	D-Pad Vertical	VerticalArrow
+Button0	Alpha0	A	Circle	Button0
+Button1	Alpha1	B	Cross	Button1
+Button2	Alpha2	X	Square	Button2
+Button3	Alpha3	Y	Triangle	Button3
+Button4	Alpha4	LB	L1	Button4
+Button5	Alpha5	RB	R1	Button5
+Button6	Alpha6	Back	Share	Button6
+Button7	Alpha7	Start	Option	Button7
+Button8	Alpha8	LT	L2	Button8
+Button9	Alpha9	RT	R2	Button9
+Button10	Return	Triggers	TouchPad	Button10
+LeftStickClick	Q	LeftStickClick	LeftStickClick	LeftStickClick
+RightStickClick	E	RightStickClick	RightStickClick	RightStickClick

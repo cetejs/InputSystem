@@ -5,7 +5,7 @@ namespace UD.Services.InputSystem
 {
     public class JoystickInput : VirtualInput
     {
-        private Dictionary<string, bool> usedButtons = new Dictionary<string, bool>();
+        private Dictionary<string, UsedButton> usedButtons = new Dictionary<string, UsedButton>();
 
         public override float GetAxis(InputMapping input)
         {
@@ -31,14 +31,14 @@ namespace UD.Services.InputSystem
         {
             if (input.isAxis)
             {
-                if (!IsUsedButton(input.joystick) && Mathf.Abs(GetAxisRaw(input)) > 0.0f)
+                if (!GetUsedButton(input.joystick).isUsedDown && Mathf.Abs(GetAxisRaw(input)) > 0.0f)
                 {
-                    SetUsedButton(input.joystick, true);
+                    GetUsedButton(input.joystick).isUsedDown = true;
                     return true;
                 }
-                if (IsUsedButton(input.joystick) && Mathf.Abs(GetAxisRaw(input)) == 0.0f)
+                if (GetUsedButton(input.joystick).isUsedDown && Mathf.Abs(GetAxisRaw(input)) == 0.0f)
                 {
-                    SetUsedButton(input.joystick, false);
+                    GetUsedButton(input.joystick).isUsedDown = false;
                 }
 
                 return false;
@@ -51,14 +51,14 @@ namespace UD.Services.InputSystem
         {
             if (input.isAxis)
             {
-                if (IsUsedButton(input.joystick) && Mathf.Abs(GetAxisRaw(input)) == 0.0f)
+                if (GetUsedButton(input.joystick).isUsedUp && Mathf.Abs(GetAxisRaw(input)) == 0.0f)
                 {
-                    SetUsedButton(input.joystick, false);
+                    GetUsedButton(input.joystick).isUsedUp = false;
                     return true;
                 }
-                if (!IsUsedButton(input.joystick) && Mathf.Abs(GetAxisRaw(input)) > 0.0f)
+                if (!GetUsedButton(input.joystick).isUsedUp && Mathf.Abs(GetAxisRaw(input)) > 0.0f)
                 {
-                    SetUsedButton(input.joystick, true);
+                    GetUsedButton(input.joystick).isUsedUp = true;
                 }
 
                 return false;
@@ -82,19 +82,26 @@ namespace UD.Services.InputSystem
             Debug.LogError($"This button up '{name}' is not possible to be called for standalone input");
         }
 
-        private bool IsUsedButton(string name)
+        private UsedButton GetUsedButton(string name)
         {
-            if (!usedButtons.TryGetValue(name, out var isUsed))
+            if (!usedButtons.TryGetValue(name, out var button))
             {
-                usedButtons[name] = isUsed = false;
+                button = new UsedButton()
+                {
+                    name = name
+                };
+                
+                usedButtons.Add(name, button);
             }
 
-            return isUsed;
+            return button;
         }
 
-        private void SetUsedButton(string name, bool value)
+        private class UsedButton
         {
-            usedButtons[name] = value;
+            public string name;
+            public bool isUsedDown;
+            public bool isUsedUp;
         }
     }
 }
