@@ -41,7 +41,7 @@ namespace UD.Services.InputSystem
             var keyCode = ConvertToKeyCode(input.keyboard);
             if (keyCode != KeyCode.None)
             {
-                return Input.GetKey(keyCode);
+                return Input.GetKeyUp(keyCode);
             }
 
             return Input.GetButtonUp(input.keyboard);

@@ -48,7 +48,7 @@ namespace UD.Services.InputSystem
         {
             Debug.LogError($"This button up '{name}' is not possible to be called for standalone input");
         }
-        
+
         protected float GetAxis(string name, bool isInvert = false)
         {
             if (isInvert)
@@ -94,6 +94,7 @@ namespace UD.Services.InputSystem
                     GetUsedButton(name).isUsedDown = true;
                     return true;
                 }
+
                 if (GetUsedButton(name).isUsedDown && Mathf.Abs(GetAxisRaw(name)) == 0.0f)
                 {
                     GetUsedButton(name).isUsedDown = false;
@@ -101,17 +102,17 @@ namespace UD.Services.InputSystem
 
                 return false;
             }
-            
+
             var keyCode = ConvertToKeyCode(name);
             if (keyCode != KeyCode.None)
             {
                 return Input.GetKeyDown(keyCode);
             }
-            
+
             return Input.GetButtonDown(name);
         }
 
-        protected  bool GetButtonUp(string name, bool isAxis)
+        protected bool GetButtonUp(string name, bool isAxis)
         {
             if (isAxis)
             {
@@ -120,6 +121,7 @@ namespace UD.Services.InputSystem
                     GetUsedButton(name).isUsedUp = false;
                     return true;
                 }
+
                 if (!GetUsedButton(name).isUsedUp && Mathf.Abs(GetAxisRaw(name)) > 0.0f)
                 {
                     GetUsedButton(name).isUsedUp = true;
@@ -182,7 +184,7 @@ namespace UD.Services.InputSystem
                 {
                     name = name
                 };
-                
+
                 usedButtons.Add(name, button);
             }
 
@@ -195,7 +197,7 @@ namespace UD.Services.InputSystem
             public bool isUsedDown;
             public bool isUsedUp;
         }
-        
+
         protected class JoystickMapping
         {
             public string joystick;

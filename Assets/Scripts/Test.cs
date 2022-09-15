@@ -7,6 +7,7 @@ public class Test : MonoBehaviour
     private void OnGUI()
     {
         var input = Global.GetService<InputManager>();
+        GUILayout.TextArea($"InputDevice : {input.InputDevice}");
         GUILayout.TextArea($"Horizontal : {input.GetAxis("Horizontal")}");
         GUILayout.TextArea($"Vertical : {input.GetAxis("Vertical")}");
         GUILayout.TextArea($"Mouse X : {input.GetAxis("Mouse X")}");

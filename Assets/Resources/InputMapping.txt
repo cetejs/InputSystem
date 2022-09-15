@@ -7,8 +7,8 @@ Mouse X	Mouse X	RightStickHorizontal	RightStickHorizontal	Mouse X
 Mouse Y	Mouse Y	RightStickVertical	RightStickVertical	Mouse Y
 HorizontalArrow	HorizontalArrow	D-Pad Horizontal	D-Pad Horizontal	HorizontalArrow
 VerticalArrow	VerticalArrow	D-Pad Vertical	D-Pad Vertical	VerticalArrow
-Button0	Alpha0	A	Circle	Button0
-Button1	Alpha1	B	Cross	Button1
+Button0	Alpha0	A	Cross	Button0
+Button1	Alpha1	B	Circle	Button1
 Button2	Alpha2	X	Square	Button2
 Button3	Alpha3	Y	Triangle	Button3
 Button4	Alpha4	LB	L1	Button4

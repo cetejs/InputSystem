@@ -16,6 +16,8 @@ namespace UD.Services.InputSystem
         private VirtualInput mobileInput = new MobileInput();
         private Dictionary<string, InputMapping> inputMappings = new Dictionary<string, InputMapping>();
 
+        private bool isForce = true;
+
         public Action<InputDevice> onDeviceChanged;
 
         public InputDevice InputDevice
@@ -313,7 +315,7 @@ namespace UD.Services.InputSystem
                 return true;
             }
 
-            if (IsPs4Device())
+            if (IsPs4Device() && isForce)
             {
                 if (Input.GetAxis("4th axis") > -1.0f ||
                     Input.GetAxis("5th axis") > -1.0f)
@@ -335,14 +337,8 @@ namespace UD.Services.InputSystem
 
         private bool IsMobileInput()
         {
-#if UNITY_EDITOR && UNITY_MOBILE
-            if (EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
-            {
-                return true;
-            }
-
-#elif MOBILE_INPUT
-            if (EventSystem.current.IsPointerOverGameObject() || Input.touchCount > 0)
+#if MOBILE_INPUT
+            if (EventSystem.current && EventSystem.current.IsPointerOverGameObject() || Input.touchCount > 0)
             {
                 return true;
             }
@@ -371,6 +367,11 @@ namespace UD.Services.InputSystem
             }
 
             return false;
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            isForce = hasFocus;
         }
     }
 
