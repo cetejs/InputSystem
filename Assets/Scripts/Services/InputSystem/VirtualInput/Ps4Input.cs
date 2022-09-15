@@ -3,63 +3,63 @@ using UnityEngine;
 
 namespace UD.Services.InputSystem
 {
-    public class XboxInput : JoystickInput
+    public class Ps4Input : JoystickInput
     {
-        private Dictionary<string, JoystickMapping> xboxMapping = new Dictionary<string, JoystickMapping>(32);
+        private Dictionary<string, JoystickMapping> ps4Mapping = new Dictionary<string, JoystickMapping>(32);
 
         public override float GetAxis(InputMapping input)
         {
-            var xbox = GetXboxMapping(input.xbox);
-            if (xbox == null)
+            var ps4 = GetPs4Mapping(input.ps4);
+            if (ps4 == null)
             {
                 return 0.0f;
             }
 
-            return GetAxis(xbox.joystick);
+            return GetAxis(ps4.joystick, ps4.isInvert);
         }
 
         public override float GetAxisRaw(InputMapping input)
         {
-            var xbox = GetXboxMapping(input.xbox);
-            if (xbox == null)
+            var ps4 = GetPs4Mapping(input.ps4);
+            if (ps4 == null)
             {
                 return 0.0f;
             }
 
-            return GetAxis(xbox.joystick);
+            return GetAxis(ps4.joystick, ps4.isInvert);
         }
 
         public override bool GetButton(InputMapping input)
         {
-            var xbox = GetXboxMapping(input.xbox);
-            if (xbox == null)
+            var ps4 = GetPs4Mapping(input.ps4);
+            if (ps4 == null)
             {
                 return false;
             }
 
-            return GetButton(xbox.joystick, xbox.isAxis);
+            return GetButton(ps4.joystick, ps4.isAxis);
         }
 
         public override bool GetButtonDown(InputMapping input)
         {
-            var xbox = GetXboxMapping(input.xbox);
-            if (xbox == null)
+            var ps4 = GetPs4Mapping(input.ps4);
+            if (ps4 == null)
             {
                 return false;
             }
 
-            return GetButtonDown(xbox.joystick, xbox.isAxis);
+            return GetButtonDown(ps4.joystick, ps4.isAxis);
         }
 
         public override bool GetButtonUp(InputMapping input)
         {
-            var xbox = GetXboxMapping(input.xbox);
-            if (xbox == null)
+            var ps4 = GetPs4Mapping(input.ps4);
+            if (ps4 == null)
             {
                 return false;
             }
 
-            return GetButtonUp(xbox.joystick, xbox.isAxis);
+            return GetButtonUp(ps4.joystick, ps4.isAxis);
         }
 
         public override void SetAxis(string name, float value)
@@ -77,21 +77,21 @@ namespace UD.Services.InputSystem
             Debug.LogError($"This button up '{name}' is not possible to be called for standalone input");
         }
 
-        private JoystickMapping GetXboxMapping(string name)
+        private JoystickMapping GetPs4Mapping(string name)
         {
-            CollectXboxMapping();
-            if (xboxMapping.TryGetValue(name, out var xbox))
+            CollectPs4Mapping();
+            if (ps4Mapping.TryGetValue(name, out var ps4))
             {
-                return xbox;
+                return ps4;
             }
 
-            Debug.LogError($"XboxMapping is not exist key {name}");
+            Debug.LogError($"Ps4Mapping is not exist key {name}");
             return null;
         }
 
-        private void CollectXboxMapping()
+        private void CollectPs4Mapping()
         {
-            if (xboxMapping.Count > 0)
+            if (ps4Mapping.Count > 0)
             {
                 return;
             }
@@ -104,7 +104,7 @@ namespace UD.Services.InputSystem
                     continue;
                 }
 
-                xboxMapping.Add(mapping.xbox, mapping);
+                ps4Mapping.Add(mapping.ps4, mapping);
             }
         }
     }

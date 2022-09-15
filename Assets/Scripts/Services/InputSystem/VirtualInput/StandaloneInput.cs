@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace UD.Services.InputSystem
 {
     public class StandaloneInput : VirtualInput
     {
-        private Dictionary<string, KeyCode> keyCodeDict = new Dictionary<string, KeyCode>();
-
         public override float GetAxis(InputMapping input)
         {
             return Input.GetAxis(input.keyboard);
@@ -64,22 +60,6 @@ namespace UD.Services.InputSystem
         public override void SetButtonUp(string name)
         {
             Debug.LogError($"This button up '{name}' is not possible to be called for standalone input");
-        }
-
-        private KeyCode ConvertToKeyCode(string name)
-        {
-            if (keyCodeDict.TryGetValue(name, out var keyCode))
-            {
-                return keyCode;
-            }
-
-            if (Enum.TryParse(typeof(KeyCode), name, out var keyCodeObj))
-            {
-                keyCode = (KeyCode)keyCodeObj;
-                keyCodeDict.Add(name, keyCode);
-            }
-
-            return keyCode;
         }
     }
 }

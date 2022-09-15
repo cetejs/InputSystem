@@ -5,11 +5,6 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    private void OnEnable()
-    {
-        
-    }
-
     private void OnGUI()
     {
         var input = Global.GetService<InputManager>();
@@ -32,15 +27,25 @@ public class Test : MonoBehaviour
         GUILayout.TextArea($"Button10 : {input.GetButton("Button10")}");
         GUILayout.TextArea($"LeftStickClick : {input.GetButton("LeftStickClick")}");
         GUILayout.TextArea($"RightStickClick : {input.GetButton("RightStickClick")}");
-
+        
         if (input.GetButtonDown("Button8"))
         {
             Debug.Log("Button8 Down");
         }
-
+        
         if (input.GetButtonUp("Button8"))
         {
             Debug.Log("Button8 Up");
         }
+        
+        GUILayout.TextArea($"x axis : {Input.GetAxis("x axis")}");
+        GUILayout.TextArea($"y axis : {Input.GetAxis("y axis")}");
+        GUILayout.TextArea($"3rd axis : {Input.GetAxis("3rd axis")}");
+        GUILayout.TextArea($"4th axis : {Input.GetAxis("4th axis")}");
+        GUILayout.TextArea($"5th axis : {Input.GetAxis("5th axis")}");
+        GUILayout.TextArea($"6th axis : {Input.GetAxis("6th axis")}");
+        GUILayout.TextArea($"8th axis : {Input.GetAxis("8th axis")}");
+        GUILayout.TextArea($"9th axis : {Input.GetAxis("9th axis")}");
+        GUILayout.TextArea($"10th axis : {Input.GetAxis("10th axis")}");
     }
 }
