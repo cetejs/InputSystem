@@ -15,7 +15,7 @@ namespace UD.Services.InputSystem
         private void Awake()
         {
             scrollbar = GetComponent<Scrollbar>();
-            scrollbar.value = Global.GetService<InputManager>().GetAxis(axisName);
+            scrollbar.value = (Global.GetService<InputManager>().GetAxis(axisName) + 1) / 2;
             scrollbar.onValueChanged.AddListener(OnValueChanged);
         }
 

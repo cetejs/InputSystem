@@ -21,12 +21,6 @@ namespace UD.Services.InputSystem
         private bool isUseVertical;
         private Vector2 startPos;
 
-        private void Awake()
-        {
-            isUseHorizontal = axisType == AxisOption.Both || axisType == AxisOption.OnlyHorizontal;
-            isUseVertical = axisType == AxisOption.Both || axisType == AxisOption.OnlyVertical;
-        }
-
         private void Start()
         {
             if (thumb == null)
@@ -39,6 +33,8 @@ namespace UD.Services.InputSystem
 
         private void UpdateAxis(Vector2 value)
         {
+            isUseHorizontal = axisType == AxisOption.Both || axisType == AxisOption.OnlyHorizontal;
+            isUseVertical = axisType == AxisOption.Both || axisType == AxisOption.OnlyVertical;
             var delta = value - startPos;
             delta /= movementRange;
             if (isUseHorizontal)

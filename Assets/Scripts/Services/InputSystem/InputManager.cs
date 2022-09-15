@@ -14,8 +14,9 @@ namespace UD.Services.InputSystem
         private VirtualInput xboxInput = new XboxInput();
         private VirtualInput ps4Input = new Ps4Input();
         private VirtualInput mobileInput = new MobileInput();
-
         private Dictionary<string, InputMapping> inputMappings = new Dictionary<string, InputMapping>();
+
+        public Action<InputDevice> onDeviceChanged;
 
         public InputDevice InputDevice
         {
@@ -124,6 +125,8 @@ namespace UD.Services.InputSystem
                     activeInput = mobileInput;
                     break;
             }
+
+            onDeviceChanged?.Invoke(device);
         }
 
         public float GetAxis(string name)
@@ -256,7 +259,7 @@ namespace UD.Services.InputSystem
 
         private bool IsMouseKeyboard()
         {
-#if MOBLIE_INPUT
+#if MOBILE_INPUT
             return false;
 #endif
             if (Event.current.isKey || Event.current.isMouse)
@@ -338,7 +341,7 @@ namespace UD.Services.InputSystem
                 return true;
             }
 
-#elif MOBLE_INPUT
+#elif MOBILE_INPUT
             if (EventSystem.current.IsPointerOverGameObject() || Input.touchCount > 0)
             {
                 return true;

@@ -9,27 +9,27 @@ namespace UD.Services.InputSystem
 
         public override float GetAxis(InputMapping input)
         {
-            return GetVirtualAxis(input.mobile).GetAxis();
+            return GetVirtualAxis(input).GetAxis();
         }
 
         public override float GetAxisRaw(InputMapping input)
         {
-            return GetVirtualAxis(input.mobile).GetAxisRaw();
+            return GetVirtualAxis(input).GetAxisRaw();
         }
 
         public override bool GetButton(InputMapping input)
         {
-            return GetVirtualButton(input.mobile).GetButton();
+            return GetVirtualButton(input).GetButton();
         }
 
         public override bool GetButtonDown(InputMapping input)
         {
-            return GetVirtualButton(input.mobile).GetButtonDown();
+            return GetVirtualButton(input).GetButtonDown();
         }
 
         public override bool GetButtonUp(InputMapping input)
         {
-            return GetVirtualButton(input.mobile).GetButtonUp();
+            return GetVirtualButton(input).GetButtonUp();
         }
 
         public override void SetAxis(string name, float value)
@@ -47,21 +47,35 @@ namespace UD.Services.InputSystem
             GetVirtualButton(name).Released();
         }
 
+        private VirtualAxis GetVirtualAxis(InputMapping input)
+        {
+            var name = string.IsNullOrEmpty(input.mobile) ? input.buttonName : input.mobile;
+            return GetVirtualAxis(name);
+        }
+
         private VirtualAxis GetVirtualAxis(string name)
         {
             if (!virtualAxes.TryGetValue(name, out var axis))
             {
-                virtualAxes.Add(name, new VirtualAxis(name));
+                axis = new VirtualAxis(name);
+                virtualAxes.Add(name, axis);
             }
 
             return axis;
+        }
+
+        private VirtualButton GetVirtualButton(InputMapping input)
+        {
+            var name = string.IsNullOrEmpty(input.mobile) ? input.buttonName : input.mobile;
+            return GetVirtualButton(name);
         }
 
         private VirtualButton GetVirtualButton(string name)
         {
             if (!virtualButtons.TryGetValue(name, out var button))
             {
-                virtualButtons.Add(name, new VirtualButton(name));
+                button = new VirtualButton(name);
+                virtualButtons.Add(name, button);
             }
 
             return button;

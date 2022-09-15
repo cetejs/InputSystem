@@ -1,6 +1,6 @@
 ﻿namespace UD.Services.InputSystem
 {
-    public struct VirtualAxis
+    public class VirtualAxis
     {
         private float value;
 

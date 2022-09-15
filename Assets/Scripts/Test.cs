@@ -26,26 +26,6 @@ public class Test : MonoBehaviour
         GUILayout.TextArea($"Button10 : {input.GetButton("Button10")}");
         GUILayout.TextArea($"LeftStickClick : {input.GetButton("LeftStickClick")}");
         GUILayout.TextArea($"RightStickClick : {input.GetButton("RightStickClick")}");
-        
-        if (input.GetButtonDown("Button8"))
-        {
-            Debug.Log("Button8 Down");
-        }
-        
-        if (input.GetButtonUp("Button8"))
-        {
-            Debug.Log("Button8 Up");
-        }
-
-        if (input.GetButtonDown("Button9"))
-        {
-            Debug.Log("Button9 Down");
-        }
-
-        if (input.GetButtonUp("Button9"))
-        {
-            Debug.Log("Button9 Up");
-        }
 
         GUILayout.TextArea($"x axis : {Input.GetAxis("x axis")}");
         GUILayout.TextArea($"y axis : {Input.GetAxis("y axis")}");

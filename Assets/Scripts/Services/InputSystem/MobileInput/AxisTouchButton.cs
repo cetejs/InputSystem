@@ -7,7 +7,7 @@ namespace UD.Services.InputSystem
     public class AxisTouchButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         [SerializeField]
-        private AxisOption axisType = AxisOption.Negative;
+        private AxisOption axisType = AxisOption.Positive;
         [SerializeField]
         private string axisName = "Horizontal";
         [SerializeField]
@@ -22,11 +22,11 @@ namespace UD.Services.InputSystem
             {
                 if(axisType == AxisOption.Negative)
                 {
-                    UpdateAxis(1);
+                    UpdateAxis(-1);
                 }
                 else if(axisType == AxisOption.Positive)
                 {
-                    UpdateAxis(-1);
+                    UpdateAxis(1);
                 }
             }
         }
@@ -52,7 +52,7 @@ namespace UD.Services.InputSystem
             Global.GetService<InputManager>().SetAxisZero(axisName);
         }
 
-        private enum AxisOption : byte
+        private enum AxisOption
         {
             Positive,
             Negative
