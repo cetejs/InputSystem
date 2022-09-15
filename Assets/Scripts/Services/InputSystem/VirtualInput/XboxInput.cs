@@ -99,7 +99,7 @@ namespace UD.Services.InputSystem
             CollectJoystickMapping();
             foreach (var mapping in joystickMappings.Values)
             {
-                if (string.IsNullOrEmpty(mapping.ps4))
+                if (string.IsNullOrEmpty(mapping.xbox))
                 {
                     continue;
                 }

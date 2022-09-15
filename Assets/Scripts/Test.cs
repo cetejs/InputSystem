@@ -1,4 +1,3 @@
-using System;
 using UD.Globals;
 using UD.Services.InputSystem;
 using UnityEngine;
@@ -37,7 +36,17 @@ public class Test : MonoBehaviour
         {
             Debug.Log("Button8 Up");
         }
-        
+
+        if (input.GetButtonDown("Button9"))
+        {
+            Debug.Log("Button9 Down");
+        }
+
+        if (input.GetButtonUp("Button9"))
+        {
+            Debug.Log("Button9 Up");
+        }
+
         GUILayout.TextArea($"x axis : {Input.GetAxis("x axis")}");
         GUILayout.TextArea($"y axis : {Input.GetAxis("y axis")}");
         GUILayout.TextArea($"3rd axis : {Input.GetAxis("3rd axis")}");

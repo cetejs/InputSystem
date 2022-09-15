@@ -298,34 +298,30 @@ namespace UD.Services.InputSystem
                 return true;
             }
 
+            if (Input.GetAxis("x axis") != 0.0f ||
+                Input.GetAxis("y axis") != 0.0f ||
+                Input.GetAxis("3rd axis") != 0.0f ||
+                Input.GetAxis("6th axis") != 0.0f ||
+                Input.GetAxis("7th axis") != 0.0f ||
+                Input.GetAxis("8th axis") != 0.0f ||
+                Input.GetAxis("9th axis") != 0.0f ||
+                Input.GetAxis("10th axis") != 0.0f)
+            {
+                return true;
+            }
+
             if (IsPs4Device())
             {
-                if (Input.GetAxis("x axis") != 0.0f ||
-                    Input.GetAxis("y axis") != 0.0f ||
-                    Input.GetAxis("3rd axis") != 0.0f ||
-                    Input.GetAxis("4th axis") > -1.0f ||
-                    Input.GetAxis("5th axis") > -1.0f ||
-                    Input.GetAxis("6th axis") != 0.0f ||
-                    Input.GetAxis("7th axis") != 0.0f ||
-                    Input.GetAxis("8th axis") != 0.0f ||
-                    Input.GetAxis("9th axis") != 0.0f ||
-                    Input.GetAxis("10th axis") != 0.0f)
+                if (Input.GetAxis("4th axis") > -1.0f ||
+                    Input.GetAxis("5th axis") > -1.0f)
                 {
                     return true;
                 }
             }
             else
             {
-                if (Input.GetAxis("x axis") != 0.0f ||
-                    Input.GetAxis("y axis") != 0.0f ||
-                    Input.GetAxis("3rd axis") != 0.0f ||
-                    Input.GetAxis("4th axis") != 0.0f ||
-                    Input.GetAxis("5th axis") != 0.0f ||
-                    Input.GetAxis("6th axis") != 0.0f ||
-                    Input.GetAxis("7th axis") != 0.0f ||
-                    Input.GetAxis("8th axis") != 0.0f ||
-                    Input.GetAxis("9th axis") != 0.0f ||
-                    Input.GetAxis("10th axis") != 0.0f)
+                if (Input.GetAxis("4th axis") != 0.0f ||
+                    Input.GetAxis("5th axis") != 0.0f)
                 {
                     return true;
                 }
