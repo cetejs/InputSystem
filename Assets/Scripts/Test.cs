@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
+    private bool isKey;
+    private KeyCode keyCode;
+
+    private void OnDisable()
+    {
+        //var input = Global.GetService<InputManager>();
+        //input.RebindButton("Button0", "Mouse 0");
+        //input.ResetButton("Button0");
+    }
+
     private void OnGUI()
     {
         var input = Global.GetService<InputManager>();
@@ -37,5 +47,13 @@ public class Test : MonoBehaviour
         GUILayout.TextArea($"8th axis : {Input.GetAxis("8th axis")}");
         GUILayout.TextArea($"9th axis : {Input.GetAxis("9th axis")}");
         GUILayout.TextArea($"10th axis : {Input.GetAxis("10th axis")}");
+
+        if (Event.current.isKey && Event.current.keyCode != KeyCode.None)
+        {
+            isKey = true;
+            keyCode = Event.current.keyCode;
+        }
+
+        GUILayout.TextArea($"KeyCode : {keyCode}");
     }
 }

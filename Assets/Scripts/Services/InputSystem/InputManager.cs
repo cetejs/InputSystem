@@ -15,8 +15,46 @@ namespace UD.Services.InputSystem
         private VirtualInput ps4Input = new Ps4Input();
         private VirtualInput mobileInput = new MobileInput();
         private Dictionary<string, InputMapping> inputMappings = new Dictionary<string, InputMapping>();
+        private Dictionary<string, InputMapping> bindedMappings = new Dictionary<string, InputMapping>();
 
-        private bool isForce = true;
+        private readonly List<KeyCode> joystickButtons = new List<KeyCode> {
+            KeyCode.Joystick1Button0,
+            KeyCode.Joystick1Button1,
+            KeyCode.Joystick1Button2,
+            KeyCode.Joystick1Button3,
+            KeyCode.Joystick1Button4,
+            KeyCode.Joystick1Button5,
+            KeyCode.Joystick1Button6,
+            KeyCode.Joystick1Button7,
+            KeyCode.Joystick1Button8,
+            KeyCode.Joystick1Button9,
+            KeyCode.Joystick1Button10,
+            KeyCode.Joystick1Button11,
+            KeyCode.Joystick1Button12,
+            KeyCode.Joystick1Button13,
+            KeyCode.Joystick1Button14,
+            KeyCode.Joystick1Button15,
+            KeyCode.Joystick1Button16,
+            KeyCode.Joystick1Button17,
+            KeyCode.Joystick1Button18,
+            KeyCode.Joystick1Button19,
+        };
+
+        private readonly List<string> joystickAxes = new List<string> {
+            "x axis",
+            "y axis",
+            "3rd axis",
+            "4th axis",
+            "5th axis",
+            "6th axis",
+            "7th axis",
+            "8th axis",
+            "9th axis",
+            "10th axis"
+        };
+
+        private bool isForce;
+        private string inputKey;
 
         public Action<InputDevice> onDeviceChanged;
 
@@ -27,8 +65,9 @@ namespace UD.Services.InputSystem
 
         private void Awake()
         {
-            SwitchDevice(InputDevice.MouseKeyboard);
+            SelectDefaultDevice();
             CollectInputMapping();
+            CollectBindedMapping();
         }
 
         private void OnGUI()
@@ -40,20 +79,24 @@ namespace UD.Services.InputSystem
                     {
                         if (IsPs4Device())
                         {
-                            SwitchDevice(InputDevice.Ps4Joystick);
+                            SwitchDevice(InputDevice.Ps4Gamepad);
                         }
                         else
                         {
-                            SwitchDevice(InputDevice.XboxJoystick);
+                            SwitchDevice(InputDevice.XboxGamepad);
                         }
                     }
                     else if (IsMobileInput())
                     {
                         SwitchDevice(InputDevice.Mobile);
                     }
+                    else 
+                    {
+                    
+                    }
 
                     break;
-                case InputDevice.XboxJoystick:
+                case InputDevice.XboxGamepad:
                     if (IsMouseKeyboard())
                     {
                         SwitchDevice(InputDevice.MouseKeyboard);
@@ -64,11 +107,11 @@ namespace UD.Services.InputSystem
                     }
                     else if (IsPs4Device() && IsJoystickInput())
                     {
-                        SwitchDevice(InputDevice.Ps4Joystick);
+                        SwitchDevice(InputDevice.Ps4Gamepad);
                     }
 
                     break;
-                case InputDevice.Ps4Joystick:
+                case InputDevice.Ps4Gamepad:
                     if (IsMouseKeyboard())
                     {
                         SwitchDevice(InputDevice.MouseKeyboard);
@@ -79,7 +122,7 @@ namespace UD.Services.InputSystem
                     }
                     else if (!IsPs4Device() && IsJoystickInput())
                     {
-                        SwitchDevice(InputDevice.XboxJoystick);
+                        SwitchDevice(InputDevice.XboxGamepad);
                     }
 
                     break;
@@ -88,11 +131,11 @@ namespace UD.Services.InputSystem
                     {
                         if (IsPs4Device())
                         {
-                            SwitchDevice(InputDevice.Ps4Joystick);
+                            SwitchDevice(InputDevice.Ps4Gamepad);
                         }
                         else
                         {
-                            SwitchDevice(InputDevice.XboxJoystick);
+                            SwitchDevice(InputDevice.XboxGamepad);
                         }
                     }
                     else if (IsMouseKeyboard())
@@ -102,6 +145,11 @@ namespace UD.Services.InputSystem
 
                     break;
             }
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            isForce = hasFocus;
         }
 
         public void SwitchDevice(InputDevice device)
@@ -117,10 +165,10 @@ namespace UD.Services.InputSystem
                 case InputDevice.MouseKeyboard:
                     activeInput = standaloneInput;
                     break;
-                case InputDevice.XboxJoystick:
+                case InputDevice.XboxGamepad:
                     activeInput = xboxInput;
                     break;
-                case InputDevice.Ps4Joystick:
+                case InputDevice.Ps4Gamepad:
                     activeInput = ps4Input;
                     break;
                 case InputDevice.Mobile:
@@ -216,15 +264,64 @@ namespace UD.Services.InputSystem
             activeInput.SetButtonUp(name);
         }
 
-        private InputMapping GetInputMapping(string name)
+        public bool IsRebindConflict(string bindName, out string conflictName)
+        {
+            conflictName = null;
+            foreach (var name in inputMappings.Keys)
+            {
+                var input = GetInputMapping(name);
+                var keyName = GetInputDeviceMapping(input, inputDevice);
+                if (keyName == bindName)
+                {
+                    conflictName = name;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void RebindButton(string name, string bindName)
+        {
+            if (bindedMappings.TryGetValue(name, out var input))
+            {
+                SetInputDeviceMapping(input, inputDevice, bindName);
+                PlayerPrefs.SetString(string.Concat(name, "_", inputDevice), bindName);
+            }
+            else
+            {
+                Debug.LogError($"InputMapping is not exist key {name}");
+            }
+        }
+
+        public void ResetButton(string name)
         {
             if (inputMappings.TryGetValue(name, out var input))
             {
-                return input;
+                var binded = bindedMappings[name];
+                SetInputDeviceMapping(binded, inputDevice, input);
+                PlayerPrefs.DeleteKey(string.Concat(name, "_", inputDevice));
             }
+        }
 
-            Debug.LogError($"InputMapping is not exist key {name}");
-            return null;
+        private void SelectDefaultDevice()
+        {
+            if (IsXboxDevice())
+            {
+                SwitchDevice(InputDevice.XboxGamepad);
+            }
+            else if (IsPs4Device())
+            {
+                SwitchDevice(InputDevice.Ps4Gamepad);
+            }
+            else if (IsMobileInput())
+            {
+                SwitchDevice(InputDevice.Mobile);
+            }
+            else
+            {
+                SwitchDevice(InputDevice.MouseKeyboard);
+            }
         }
 
         private void CollectInputMapping()
@@ -256,6 +353,94 @@ namespace UD.Services.InputSystem
 
                     inputMappings.Add(mapping.buttonName, mapping);
                 }
+            }
+        }
+
+        private void CollectBindedMapping()
+        {
+            foreach (var name in inputMappings.Keys)
+            {
+                var rebind = new InputMapping()
+                {
+                    buttonName = name,
+                    keyboard = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.MouseKeyboard), inputMappings[name].keyboard),
+                    xbox = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.XboxGamepad), inputMappings[name].xbox),
+                    ps4 = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.Ps4Gamepad), inputMappings[name].ps4),
+                    mobile = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.Mobile), inputMappings[name].mobile)
+                };
+
+                bindedMappings.Add(name, rebind);
+            }
+        }
+
+        private InputMapping GetInputMapping(string name)
+        {
+            if (bindedMappings.TryGetValue(name, out var input))
+            {
+                return input;
+            }
+
+            if (inputMappings.TryGetValue(name, out input))
+            {
+                return input;
+            }
+
+            Debug.LogError($"InputMapping is not exist key {name}");
+            return null;
+        }
+
+        private string GetInputDeviceMapping(InputMapping input, InputDevice device)
+        {
+            switch (inputDevice)
+            {
+                case InputDevice.MouseKeyboard:
+                    return input.keyboard;
+                case InputDevice.XboxGamepad:
+                    return input.xbox;
+                case InputDevice.Ps4Gamepad:
+                    return input.ps4;
+                case InputDevice.Mobile:
+                    return input.mobile;
+                default:
+                    return input.keyboard;
+            }
+        }
+
+        private void SetInputDeviceMapping(InputMapping input, InputDevice device, string value)
+        {
+            switch (inputDevice)
+            {
+                case InputDevice.MouseKeyboard:
+                    input.keyboard = value;
+                    break;
+                case InputDevice.XboxGamepad:
+                    input.xbox = value;
+                    break;
+                case InputDevice.Ps4Gamepad:
+                    input.ps4 = value;
+                    break;
+                case InputDevice.Mobile:
+                    input.mobile = value;
+                    break;
+            }
+        }
+
+        private void SetInputDeviceMapping(InputMapping input, InputDevice device, InputMapping value)
+        {
+            switch (inputDevice)
+            {
+                case InputDevice.MouseKeyboard:
+                    input.keyboard = value.keyboard;
+                    break;
+                case InputDevice.XboxGamepad:
+                    input.xbox = value.xbox;
+                    break;
+                case InputDevice.Ps4Gamepad:
+                    input.ps4 = value.ps4;
+                    break;
+                case InputDevice.Mobile:
+                    input.mobile = value.mobile;
+                    break;
             }
         }
 
@@ -369,17 +554,71 @@ namespace UD.Services.InputSystem
             return false;
         }
 
-        private void OnApplicationFocus(bool hasFocus)
+        private string GetMouseKeyboard()
         {
-            isForce = hasFocus;
+            if (Event.current.isKey && Event.current.keyCode != KeyCode.None)
+            {
+                inputKey = Event.current.ToString();
+            }
+
+            for (int i = 0; i < 3; i++)
+            {
+                if (Input.GetMouseButtonDown(i))
+                {
+                    inputKey = string.Concat("Mouse ", i);
+                }
+            }
+
+            return null;
         }
+
+        //private string GetJoystickInput()
+        //{
+        //    if (Input.GetKey(KeyCode.Joystick1Button0) ||
+        //        Input.GetKey(KeyCode.Joystick1Button1) ||
+        //        Input.GetKey(KeyCode.Joystick1Button2) ||
+        //        Input.GetKey(KeyCode.Joystick1Button3) ||
+        //        Input.GetKey(KeyCode.Joystick1Button4) ||
+        //        Input.GetKey(KeyCode.Joystick1Button5) ||
+        //        Input.GetKey(KeyCode.Joystick1Button6) ||
+        //        Input.GetKey(KeyCode.Joystick1Button7) ||
+        //        Input.GetKey(KeyCode.Joystick1Button8) ||
+        //        Input.GetKey(KeyCode.Joystick1Button9) ||
+        //        Input.GetKey(KeyCode.Joystick1Button10) ||
+        //        Input.GetKey(KeyCode.Joystick1Button11) ||
+        //        Input.GetKey(KeyCode.Joystick1Button12) ||
+        //        Input.GetKey(KeyCode.Joystick1Button13) ||
+        //        Input.GetKey(KeyCode.Joystick1Button14) ||
+        //        Input.GetKey(KeyCode.Joystick1Button15) ||
+        //        Input.GetKey(KeyCode.Joystick1Button16) ||
+        //        Input.GetKey(KeyCode.Joystick1Button17) ||
+        //        Input.GetKey(KeyCode.Joystick1Button18) ||
+        //        Input.GetKey(KeyCode.Joystick1Button19))
+        //    {
+        //        return true;
+        //    }
+
+        //    if (Input.GetAxis("x axis") != 0.0f ||
+        //        Input.GetAxis("y axis") != 0.0f ||
+        //        Input.GetAxis("3rd axis") != 0.0f ||
+        //        Input.GetAxis("6th axis") != 0.0f ||
+        //        Input.GetAxis("7th axis") != 0.0f ||
+        //        Input.GetAxis("8th axis") != 0.0f ||
+        //        Input.GetAxis("9th axis") != 0.0f ||
+        //        Input.GetAxis("10th axis") != 0.0f)
+        //    {
+        //        return true;
+        //    }
+
+        //    return null;
+        //}
     }
 
     public enum InputDevice
     {
         MouseKeyboard,
-        XboxJoystick,
-        Ps4Joystick,
+        XboxGamepad,
+        Ps4Gamepad,
         Mobile,
     }
 

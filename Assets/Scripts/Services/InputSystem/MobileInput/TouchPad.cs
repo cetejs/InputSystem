@@ -12,21 +12,18 @@ namespace UD.Services.InputSystem
         private string horizontalAxisName = "Mouse X";
         [SerializeField]
         private string verticalAxisName = "Mouse Y";
-        [SerializeField] 
+        [SerializeField]
         private float responseSpeed = 1f;
 
         private bool isUseHorizontal;
         private bool isUseVertical;
         private Vector2 previousPos;
 
-        private void Awake()
+        private void UpdateAxis(Vector2 value)
         {
             isUseHorizontal = axisType == AxisOption.Both || axisType == AxisOption.OnlyHorizontal;
             isUseVertical = axisType == AxisOption.Both || axisType == AxisOption.OnlyVertical;
-        }
 
-        private void UpdateAxis(Vector2 value)
-        {
             var delta = value.normalized;
             if (isUseHorizontal)
             {
