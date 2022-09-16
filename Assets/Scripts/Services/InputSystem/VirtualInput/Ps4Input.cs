@@ -64,17 +64,14 @@ namespace UD.Services.InputSystem
 
         public override void SetAxis(string name, float value)
         {
-            Debug.LogError($"This axis '{name}' is not possible to be called for standalone input");
         }
 
         public override void SetButtonDown(string name)
         {
-            Debug.LogError($"This button down '{name}' is not possible to be called for standalone input");
         }
 
         public override void SetButtonUp(string name)
         {
-            Debug.LogError($"This button up '{name}' is not possible to be called for standalone input");
         }
 
         private JoystickMapping GetPs4Mapping(string name)

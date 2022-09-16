@@ -338,7 +338,7 @@ namespace UD.Services.InputSystem
         private bool IsMobileInput()
         {
 #if MOBILE_INPUT
-            if (EventSystem.current && EventSystem.current.IsPointerOverGameObject() || Input.touchCount > 0)
+            if (EventSystem.current && EventSystem.current.IsPointerOverGameObject() && Event.current.isMouse || Input.touchCount > 0)
             {
                 return true;
             }
