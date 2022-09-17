@@ -1,12 +1,11 @@
 using UnityEngine;
 
 
-namespace UD.Services.InputSystem 
+namespace UD.Services.InputSystem
 {
     [ExecuteInEditMode]
     public class MobileControlRig : MonoBehaviour
     {
-
 #if !UNITY_EDITOR
 	    private void OnEnable()
         {
@@ -30,12 +29,11 @@ namespace UD.Services.InputSystem
 #endif
         }
 
-
-        private void EnableControlRig(bool enabled)
+        private void EnableControlRig(bool isEnable)
         {
             foreach (Transform t in transform)
             {
-                t.gameObject.SetActive(enabled);
+                t.gameObject.SetActive(isEnable);
             }
         }
     }

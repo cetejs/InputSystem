@@ -5,7 +5,14 @@ namespace UD.Services.InputSystem
 {
     public class XboxInput : JoystickInput
     {
-        private Dictionary<string, JoystickMapping> xboxMapping = new Dictionary<string, JoystickMapping>(32);
+        private InputData inputData;
+        private Dictionary<string, JoystickMapping> xboxMappings = new Dictionary<string, JoystickMapping>(32);
+
+        public XboxInput(InputData inputData)
+        {
+            this.inputData = inputData;
+            CollectXboxMapping();
+        }
 
         public override float GetAxis(InputMapping input)
         {
@@ -73,11 +80,21 @@ namespace UD.Services.InputSystem
         public override void SetButtonUp(string name)
         {
         }
+        
+        public override string GetButtonMapping(InputMapping input)
+        {
+            var xbox = GetXboxMapping(input.xbox);
+            if (xbox != null)
+            {
+                return xbox.joystick;
+            }
+
+            return null;
+        }
 
         private JoystickMapping GetXboxMapping(string name)
         {
-            CollectXboxMapping();
-            if (xboxMapping.TryGetValue(name, out var xbox))
+            if (xboxMappings.TryGetValue(name, out var xbox))
             {
                 return xbox;
             }
@@ -88,21 +105,15 @@ namespace UD.Services.InputSystem
 
         private void CollectXboxMapping()
         {
-            if (xboxMapping.Count > 0)
+            inputData.ForeachJoystickMappings(joystick =>
             {
-                return;
-            }
-
-            CollectJoystickMapping();
-            foreach (var mapping in joystickMappings.Values)
-            {
-                if (string.IsNullOrEmpty(mapping.xbox))
+                if (string.IsNullOrEmpty(joystick.xbox))
                 {
-                    continue;
+                    return;
                 }
 
-                xboxMapping.Add(mapping.xbox, mapping);
-            }
+                xboxMappings.Add(joystick.xbox, joystick);
+            });
         }
     }
 }

@@ -49,7 +49,7 @@ namespace UD.Cameras
 
         protected override void FollowTarget()
         {
-            if(moveSpeed > 0)
+            if (moveSpeed > 0)
             {
                 transform.position = Vector3.Lerp(transform.position, Target.position, moveSpeed * Time.deltaTime);
             }
@@ -81,7 +81,7 @@ namespace UD.Cameras
             lookTargetRot = Quaternion.Euler(0, lookAngle, 0);
             tiltTargetRot = Quaternion.Euler(tiltAngle, pivotEuler.y, pivotEuler.z);
 
-            if(turnSmoothing > 0)
+            if (turnSmoothing > 0)
             {
                 transform.localRotation = Quaternion.Slerp(transform.localRotation, lookTargetRot, turnSmoothing * Time.deltaTime);
                 pivot.localRotation = Quaternion.Slerp(pivot.localRotation, tiltTargetRot, turnSmoothing * Time.deltaTime);

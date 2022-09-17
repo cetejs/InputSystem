@@ -5,7 +5,14 @@ namespace UD.Services.InputSystem
 {
     public class Ps4Input : JoystickInput
     {
-        private Dictionary<string, JoystickMapping> ps4Mapping = new Dictionary<string, JoystickMapping>(32);
+        private InputData inputData;
+        private Dictionary<string, JoystickMapping> ps4Mappings = new Dictionary<string, JoystickMapping>(32);
+
+        public Ps4Input(InputData inputData)
+        {
+            this.inputData = inputData;
+            CollectPs4Mapping();
+        }
 
         public override float GetAxis(InputMapping input)
         {
@@ -74,10 +81,20 @@ namespace UD.Services.InputSystem
         {
         }
 
+        public override string GetButtonMapping(InputMapping input)
+        {
+            var ps4 = GetPs4Mapping(input.ps4);
+            if (ps4 != null)
+            {
+                return ps4.joystick;
+            }
+
+            return null;
+        }
+
         private JoystickMapping GetPs4Mapping(string name)
         {
-            CollectPs4Mapping();
-            if (ps4Mapping.TryGetValue(name, out var ps4))
+            if (ps4Mappings.TryGetValue(name, out var ps4))
             {
                 return ps4;
             }
@@ -88,21 +105,15 @@ namespace UD.Services.InputSystem
 
         private void CollectPs4Mapping()
         {
-            if (ps4Mapping.Count > 0)
+            inputData.ForeachJoystickMappings(joystick =>
             {
-                return;
-            }
-
-            CollectJoystickMapping();
-            foreach (var mapping in joystickMappings.Values)
-            {
-                if (string.IsNullOrEmpty(mapping.ps4))
+                if (string.IsNullOrEmpty(joystick.ps4))
                 {
-                    continue;
+                    return;
                 }
 
-                ps4Mapping.Add(mapping.ps4, mapping);
-            }
+                ps4Mappings.Add(joystick.ps4, joystick);
+            });
         }
     }
 }

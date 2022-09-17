@@ -2,14 +2,12 @@
 {
     public class VirtualAxis
     {
+        private string name;
         private float value;
-
-        public string Name { get; }
 
         public VirtualAxis(string name)
         {
-            Name = name;
-            value = 0;
+            this.name = name;
         }
 
         public void Update(float value)

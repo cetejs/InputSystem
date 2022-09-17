@@ -7,18 +7,18 @@ using UnityEngine;
 
 namespace MiniFramework
 {
-    internal sealed class DefineSymbolWindow : EditorWindow
+    internal sealed class SymbolWindow : EditorWindow
     {
-        private const string DefineSymbolPath = "Editor/DefineSymbol/DefineSymbol.txt";
+        private const string DefineSymbolPath = "Editor/DefineSymbol/Symbols.txt";
 
         private BuildTargetGroup targetGroup = BuildTargetGroup.Standalone;
-        private readonly List<DefineSymbol> defineSymbols = new List<DefineSymbol>();
+        private readonly List<Symbol> symbols = new List<Symbol>();
 
-        [MenuItem("Tool/DefineSymbolWindow")]
+        [MenuItem("Tool/SymbolWindow")]
         private static void CreatWindow()
         {
-            DefineSymbolWindow window = GetWindow<DefineSymbolWindow>();
-            window.titleContent.text = "DefineSymbolWindow";
+            var window = GetWindow<SymbolWindow>();
+            window.titleContent.text = "SymbolWindow";
         }
 
         private void OnEnable()
@@ -31,33 +31,31 @@ namespace MiniFramework
         {
             EditorGUILayout.BeginHorizontal(EditorStyles.toolbar);
             {
-                Rect optionsRect = GUILayoutUtility.GetRect(0, 20, GUILayout.ExpandWidth(false));
+                var optionsRect = GUILayoutUtility.GetRect(0, 20, GUILayout.ExpandWidth(false));
                 if (GUILayout.Button("Options", EditorStyles.toolbarDropDown, GUILayout.ExpandWidth(false)))
                 {
-                    GenericMenu options = new GenericMenu();
-                    options.AddItem(new GUIContent("Show in Explorer"), false, OnShowInExplorerClick);
-                    options.AddItem(new GUIContent("Clear All"), false, OnClearAllClick);
+                    var options = new GenericMenu();
+                    options.AddItem(new GUIContent("Show in Explorer"), false, OnShowInExplorerClicked);
+                    options.AddItem(new GUIContent("Clear All"), false, OnClearAllClicked);
                     options.DropDown(optionsRect);
                 }
             }
             EditorGUILayout.EndHorizontal();
             var lastTargetGroup = targetGroup;
-            targetGroup = (BuildTargetGroup)EditorGUILayout.EnumPopup("targetGroup", targetGroup);
-            for (int i = 0; i < defineSymbols.Count; i++)
+            targetGroup = (BuildTargetGroup) EditorGUILayout.EnumPopup("targetGroup", targetGroup);
+            foreach (var symbol in symbols)
             {
-                DefineSymbol defineSymbol = defineSymbols[i];
-                defineSymbol.isActive = EditorGUILayout.Toggle(defineSymbol.content, defineSymbol.isActive);
-                defineSymbols[i] = defineSymbol;
+                symbol.enabled = EditorGUILayout.Toggle(symbol.content, symbol.enabled);
             }
 
             if (GUILayout.Button("Refresh") || lastTargetGroup != targetGroup)
             {
-                OnRefreshClick();
+                OnRefreshClicked();
             }
 
             if (GUILayout.Button("Save"))
             {
-                OnSaveClick();
+                OnSaveClicked();
             }
         }
 
@@ -68,7 +66,7 @@ namespace MiniFramework
 
         private void CollectDefineSymbol()
         {
-            defineSymbols.Clear();
+            symbols.Clear();
             var activeDefineSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
             var fullPath = Path.Combine(Application.dataPath, DefineSymbolPath);
             if (File.Exists(fullPath))
@@ -80,12 +78,13 @@ namespace MiniFramework
                 }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string line in lines)
                 {
-                    DefineSymbol defineSymbol = new DefineSymbol
+                    var symbol = new Symbol
                     {
                         content = line,
-                        isActive = activeDefineSymbols.Contains(line)
+                        enabled = activeDefineSymbols.Contains(line)
                     };
-                    defineSymbols.Add(defineSymbol);
+
+                    symbols.Add(symbol);
                 }
             }
             else
@@ -98,11 +97,11 @@ namespace MiniFramework
         private void SaveDefineSymbol()
         {
             var sb = new StringBuilder();
-            foreach (DefineSymbol defineSymbol in defineSymbols)
+            foreach (var symbol in symbols)
             {
-                if (defineSymbol.isActive)
+                if (symbol.enabled)
                 {
-                    sb.AppendFormat("{0};", defineSymbol.content);
+                    sb.AppendFormat("{0};", symbol.content);
                 }
             }
 
@@ -114,31 +113,31 @@ namespace MiniFramework
             PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, "");
         }
 
-        private void OnShowInExplorerClick()
+        private void OnShowInExplorerClicked()
         {
             var fullPath = Path.Combine(Application.dataPath, DefineSymbolPath);
             EditorUtility.RevealInFinder(fullPath);
         }
 
-        private void OnClearAllClick()
+        private void OnClearAllClicked()
         {
             ClearDefineSymbol();
         }
 
-        private void OnRefreshClick()
+        private void OnRefreshClicked()
         {
             CollectDefineSymbol();
         }
 
-        private void OnSaveClick()
+        private void OnSaveClicked()
         {
             SaveDefineSymbol();
         }
 
-        private struct DefineSymbol
+        private class Symbol
         {
             public string content;
-            public bool isActive;
+            public bool enabled;
         }
     }
 }

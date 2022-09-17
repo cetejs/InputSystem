@@ -4,15 +4,9 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    private bool isKey;
     private KeyCode keyCode;
-
-    private void OnDisable()
-    {
-        //var input = Global.GetService<InputManager>();
-        //input.RebindButton("Button0", "Mouse 0");
-        //input.ResetButton("Button0");
-    }
+    private string inputName;
+    private float inputAxis;
 
     private void OnGUI()
     {
@@ -50,10 +44,17 @@ public class Test : MonoBehaviour
 
         if (Event.current.isKey && Event.current.keyCode != KeyCode.None)
         {
-            isKey = true;
             keyCode = Event.current.keyCode;
         }
 
+        if (!string.IsNullOrEmpty(input.InputName))
+        {
+            inputName = input.InputName;
+            inputAxis = input.InputAxis;
+        }
+
         GUILayout.TextArea($"KeyCode : {keyCode}");
+        GUILayout.TextArea($"InputName : {inputName}");
+        GUILayout.TextArea($"InputAxis : {inputAxis}");
     }
 }

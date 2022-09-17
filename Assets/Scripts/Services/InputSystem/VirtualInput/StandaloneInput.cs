@@ -58,5 +58,10 @@ namespace UD.Services.InputSystem
         public override void SetButtonUp(string name)
         {
         }
+
+        public override string GetButtonMapping(InputMapping input)
+        {
+            return input.keyboard;
+        }
     }
 }

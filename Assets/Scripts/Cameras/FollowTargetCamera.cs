@@ -4,9 +4,9 @@ namespace UD.Cameras
 {
     public abstract class FollowTargetCamera : MonoBehaviour
     {
-        [SerializeField] 
+        [SerializeField]
         protected Transform target;
-        [SerializeField] 
+        [SerializeField]
         protected UpdateType updateType = UpdateType.LateUpdate;
 
         protected Camera cam;

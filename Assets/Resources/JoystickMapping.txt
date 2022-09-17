@@ -10,7 +10,7 @@ Joystick1Button5	RB	R1	0	0
 Joystick1Button6	Back	L2	0	0
 Joystick1Button7	Start	R2	0	0
 Joystick1Button8	LeftStickClick	Share	0	0
-Joystick1Button9	RightStickClick	Option	0	0
+Joystick1Button9	RightStickClick	Options	0	0
 Joystick1Button10		LeftStickClick	0	0
 Joystick1Button11		RightStickClick	0	0
 Joystick1Button12		PlayStation	0	0

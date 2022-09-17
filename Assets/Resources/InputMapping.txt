@@ -1,22 +1,26 @@
-string	string	string	string	string
-ButtonName	Keyboard	Xbox	Ps4	Mobile
-按钮名称	键盘按键名	Xbox 手柄按键名	Ps4 手柄按键名	手机按键名
-Horizontal	Horizontal	LeftStickHorizontal	LeftStickHorizontal	Horizontal
-Vertical	Vertical	LeftStickVertical	LeftStickVertical	Vertical
-Mouse X	Mouse X	RightStickHorizontal	RightStickHorizontal	Mouse X
-Mouse Y	Mouse Y	RightStickVertical	RightStickVertical	Mouse Y
-HorizontalArrow	HorizontalArrow	D-Pad Horizontal	D-Pad Horizontal	HorizontalArrow
-VerticalArrow	VerticalArrow	D-Pad Vertical	D-Pad Vertical	VerticalArrow
-Button0	Alpha0	A	Cross	Button0
-Button1	Alpha1	B	Circle	Button1
-Button2	Alpha2	X	Square	Button2
-Button3	Alpha3	Y	Triangle	Button3
-Button4	Alpha4	LB	L1	Button4
-Button5	Alpha5	RB	R1	Button5
-Button6	Alpha6	Back	Share	Button6
-Button7	Alpha7	Start	Option	Button7
-Button8	Alpha8	LT	L2	Button8
-Button9	Alpha9	RT	R2	Button9
-Button10	Return	Triggers	TouchPad	Button10
-LeftStickClick	Q	LeftStickClick	LeftStickClick	LeftStickClick
-RightStickClick	E	RightStickClick	RightStickClick	RightStickClick
+string	string	string	string	string	string
+ButtonName	Description	Keyboard	Xbox	Ps4	Mobile
+按钮名称	按钮描述	键盘按键名	Xbox 手柄按键名	Ps4 手柄按键名	手机按键名
+HorizontalNav	Navigation	HorizontalArrow	D-Pad Horizontal	D-Pad Horizontal	HorizontalNav
+VerticalNav	Navigation	VerticalArrow	D-Pad Vertical	D-Pad Vertical	VerticalNav
+Submit	Submit	Return	A	Cross	Submit
+Cancel	Cancel	Backspace	B	Circle	Cancel
+Horizontal	Move	Horizontal	LeftStickHorizontal	LeftStickHorizontal	Horizontal
+Vertical	Move	Vertical	LeftStickVertical	LeftStickVertical	Vertical
+Mouse X	RotateView	Mouse X	RightStickHorizontal	RightStickHorizontal	Mouse X
+Mouse Y	RotateView	Mouse Y	RightStickVertical	RightStickVertical	Mouse Y
+HorizontalArrow	SelectItem	HorizontalArrow	D-Pad Horizontal	D-Pad Horizontal	HorizontalArrow
+VerticalArrow	SelectItem	VerticalArrow	D-Pad Vertical	D-Pad Vertical	VerticalArrow
+Button0	Jump	Alpha0	A	Cross	Button0
+Button1	Spring	Alpha1	B	Circle	Button1
+Button2	Shoot	Alpha2	X	Square	Button2
+Button3		Alpha3	Y	Triangle	Button3
+Button4		Alpha4	LB	L1	Button4
+Button5		Alpha5	RB	R1	Button5
+Button6		Alpha6	Back	Share	Button6
+Button7		Alpha7	Start	Options	Button7
+Button8		Alpha8	LT	L2	Button8
+Button9		Alpha9	RT	R2	Button9
+Button10		Return	Triggers	TouchPad	Button10
+LeftStickClick	Spring	Q	LeftStickClick	LeftStickClick	LeftStickClick
+RightStickClick	Lock	E	RightStickClick	RightStickClick	RightStickClick

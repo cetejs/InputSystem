@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using System;
+using UnityEngine.UI;
 
 namespace UD.Services.InputSystem
 {
@@ -10,14 +11,11 @@ namespace UD.Services.InputSystem
     {
         private InputDevice inputDevice;
         private VirtualInput activeInput;
-        private VirtualInput standaloneInput = new StandaloneInput();
-        private VirtualInput xboxInput = new XboxInput();
-        private VirtualInput ps4Input = new Ps4Input();
-        private VirtualInput mobileInput = new MobileInput();
-        private Dictionary<string, InputMapping> inputMappings = new Dictionary<string, InputMapping>();
-        private Dictionary<string, InputMapping> bindedMappings = new Dictionary<string, InputMapping>();
+        private InputData inputData = new InputData();
+        private Dictionary<int, VirtualInput> virtualInputs = new Dictionary<int, VirtualInput>();
 
-        private readonly List<KeyCode> joystickButtons = new List<KeyCode> {
+        private readonly List<KeyCode> joystickButtons = new List<KeyCode>
+        {
             KeyCode.Joystick1Button0,
             KeyCode.Joystick1Button1,
             KeyCode.Joystick1Button2,
@@ -40,7 +38,8 @@ namespace UD.Services.InputSystem
             KeyCode.Joystick1Button19,
         };
 
-        private readonly List<string> joystickAxes = new List<string> {
+        private readonly List<string> joystickAxes = new List<string>
+        {
             "x axis",
             "y axis",
             "3rd axis",
@@ -53,8 +52,9 @@ namespace UD.Services.InputSystem
             "10th axis"
         };
 
-        private bool isForce;
-        private string inputKey;
+        private bool isForce = true;
+        private string inputName;
+        private float inputAxis;
 
         public Action<InputDevice> onDeviceChanged;
 
@@ -63,11 +63,30 @@ namespace UD.Services.InputSystem
             get { return inputDevice; }
         }
 
+        public bool IsJoystickDevice
+        {
+            get
+            {
+                return inputDevice == InputDevice.XboxGamepad ||
+                       inputDevice == InputDevice.Ps4Gamepad;
+            }
+        }
+
+        public string InputName
+        {
+            get { return inputName; }
+        }
+
+        public float InputAxis
+        {
+            get { return inputAxis; }
+        }
+
         private void Awake()
         {
+            InitEventSystem();
+            InitInputDevice();
             SelectDefaultDevice();
-            CollectInputMapping();
-            CollectBindedMapping();
         }
 
         private void OnGUI()
@@ -90,9 +109,9 @@ namespace UD.Services.InputSystem
                     {
                         SwitchDevice(InputDevice.Mobile);
                     }
-                    else 
+                    else
                     {
-                    
+                        UpdateMouseKeyboard();
                     }
 
                     break;
@@ -147,6 +166,20 @@ namespace UD.Services.InputSystem
             }
         }
 
+        private void Update()
+        {
+            switch (inputDevice)
+            {
+                case InputDevice.XboxGamepad:
+                case InputDevice.Ps4Gamepad:
+                    UpdateJoystickInput();
+                    break;
+                case InputDevice.Mobile:
+                    inputName = null;
+                    break;
+            }
+        }
+
         private void OnApplicationFocus(bool hasFocus)
         {
             isForce = hasFocus;
@@ -160,28 +193,13 @@ namespace UD.Services.InputSystem
             }
 
             inputDevice = device;
-            switch (inputDevice)
-            {
-                case InputDevice.MouseKeyboard:
-                    activeInput = standaloneInput;
-                    break;
-                case InputDevice.XboxGamepad:
-                    activeInput = xboxInput;
-                    break;
-                case InputDevice.Ps4Gamepad:
-                    activeInput = ps4Input;
-                    break;
-                case InputDevice.Mobile:
-                    activeInput = mobileInput;
-                    break;
-            }
-
+            activeInput = virtualInputs[(int) device];
             onDeviceChanged?.Invoke(device);
         }
 
         public float GetAxis(string name)
         {
-            var input = GetInputMapping(name);
+            var input = inputData.GetBoundMapping(name);
             if (input == null)
             {
                 return 0.0f;
@@ -192,7 +210,7 @@ namespace UD.Services.InputSystem
 
         public float GetAxisRaw(string name)
         {
-            var input = GetInputMapping(name);
+            var input = inputData.GetBoundMapping(name);
             if (input == null)
             {
                 return 0.0f;
@@ -203,7 +221,7 @@ namespace UD.Services.InputSystem
 
         public bool GetButton(string name)
         {
-            var input = GetInputMapping(name);
+            var input = inputData.GetBoundMapping(name);
             if (input == null)
             {
                 return false;
@@ -214,7 +232,7 @@ namespace UD.Services.InputSystem
 
         public bool GetButtonDown(string name)
         {
-            var input = GetInputMapping(name);
+            var input = inputData.GetBoundMapping(name);
             if (input == null)
             {
                 return false;
@@ -225,7 +243,7 @@ namespace UD.Services.InputSystem
 
         public bool GetButtonUp(string name)
         {
-            var input = GetInputMapping(name);
+            var input = inputData.GetBoundMapping(name);
             if (input == null)
             {
                 return false;
@@ -266,42 +284,99 @@ namespace UD.Services.InputSystem
 
         public bool IsRebindConflict(string bindName, out string conflictName)
         {
-            conflictName = null;
-            foreach (var name in inputMappings.Keys)
-            {
-                var input = GetInputMapping(name);
-                var keyName = GetInputDeviceMapping(input, inputDevice);
-                if (keyName == bindName)
-                {
-                    conflictName = name;
-                    return true;
-                }
-            }
-
-            return false;
+            return inputData.IsRebindConflict(bindName, inputDevice, out conflictName);
         }
 
         public void RebindButton(string name, string bindName)
         {
-            if (bindedMappings.TryGetValue(name, out var input))
-            {
-                SetInputDeviceMapping(input, inputDevice, bindName);
-                PlayerPrefs.SetString(string.Concat(name, "_", inputDevice), bindName);
-            }
-            else
-            {
-                Debug.LogError($"InputMapping is not exist key {name}");
-            }
+            inputData.RebindButton(name, inputDevice, bindName);
         }
 
         public void ResetButton(string name)
         {
-            if (inputMappings.TryGetValue(name, out var input))
+            inputData.ResetButton(name, inputDevice);
+        }
+
+        public string GetDescription(string name)
+        {
+            var input = inputData.GetInputMapping(name);
+            if (input != null)
             {
-                var binded = bindedMappings[name];
-                SetInputDeviceMapping(binded, inputDevice, input);
-                PlayerPrefs.DeleteKey(string.Concat(name, "_", inputDevice));
+                var description = input.description;
+                if (string.IsNullOrEmpty(description))
+                {
+                    description = input.buttonName;
+                }
+
+                return description;
             }
+
+            return null;
+        }
+
+        public string GetActiveInputMapping(string name)
+        {
+            var input = inputData.GetInputMapping(name);
+            if (input != null)
+            {
+                return inputData.GetInputDeviceMapping(input, inputDevice);
+            }
+
+            return null;
+        }
+
+        public string GetActiveBoundMapping(string name)
+        {
+            var input = inputData.GetBoundMapping(name);
+            if (input != null)
+            {
+                return inputData.GetInputDeviceMapping(input, inputDevice);
+            }
+
+            return null;
+        }
+
+        public void SelectDefaultGo()
+        {
+            if (IsJoystickDevice)
+            {
+                if (!EventSystem.current.currentSelectedGameObject)
+                {
+                    var selectable = FindObjectOfType<Selectable>();
+                    if (selectable)
+                    {
+                        EventSystem.current.SetSelectedGameObject(selectable.gameObject);
+                    }
+                }
+            }
+        }
+
+        private void InitEventSystem()
+        {
+            if (EventSystem.current == null)
+            {
+                EventSystem.current = new GameObject("EventSystem").AddComponent<EventSystem>();
+                EventSystem.current.gameObject.AddComponent<StandaloneInputModule>();
+            }
+
+            var inputModule = EventSystem.current.GetComponent<StandaloneInputModule>();
+            var customInput = inputModule.gameObject.AddComponent<CustomInput>();
+            customInput.onGetButtonDown = GetButtonDown;
+            customInput.onGetAxisRaw = GetAxisRaw;
+            inputModule.inputOverride = customInput;
+            inputModule.horizontalAxis = "HorizontalNav";
+            inputModule.verticalAxis = "VerticalNav";
+            inputModule.submitButton = "Submit";
+            inputModule.cancelButton = "Cancel";
+        }
+
+        private void InitInputDevice()
+        {
+            inputData.Init();
+            virtualInputs.Add((int) InputDevice.MouseKeyboard, new StandaloneInput());
+            virtualInputs.Add((int) InputDevice.XboxGamepad, new XboxInput(inputData));
+            virtualInputs.Add((int) InputDevice.Ps4Gamepad, new Ps4Input(inputData));
+            virtualInputs.Add((int) InputDevice.Mobile, new MobileInput());
         }
 
         private void SelectDefaultDevice()
@@ -321,126 +396,6 @@ namespace UD.Services.InputSystem
             else
             {
                 SwitchDevice(InputDevice.MouseKeyboard);
-            }
-        }
-
-        private void CollectInputMapping()
-        {
-            var textAsset = Resources.Load<TextAsset>("InputMapping");
-            if (!textAsset)
-            {
-                Debug.LogError("Resources dont exist InputMapping");
-            }
-            else
-            {
-                var lines = textAsset.text.Split(new[]
-                {
-                    "\r\n",
-                    "\n"
-                }, StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 3; i < lines.Length; i++)
-                {
-                    var column = lines[i].Split('\t');
-                    var mapping = new InputMapping()
-                    {
-                        buttonName = column[0],
-                        keyboard = column[1],
-                        xbox = column[2],
-                        ps4 = column[3],
-                        mobile = column[4],
-                    };
-
-                    inputMappings.Add(mapping.buttonName, mapping);
-                }
-            }
-        }
-
-        private void CollectBindedMapping()
-        {
-            foreach (var name in inputMappings.Keys)
-            {
-                var rebind = new InputMapping()
-                {
-                    buttonName = name,
-                    keyboard = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.MouseKeyboard), inputMappings[name].keyboard),
-                    xbox = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.XboxGamepad), inputMappings[name].xbox),
-                    ps4 = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.Ps4Gamepad), inputMappings[name].ps4),
-                    mobile = PlayerPrefs.GetString(string.Concat(name, "_", InputDevice.Mobile), inputMappings[name].mobile)
-                };
-
-                bindedMappings.Add(name, rebind);
-            }
-        }
-
-        private InputMapping GetInputMapping(string name)
-        {
-            if (bindedMappings.TryGetValue(name, out var input))
-            {
-                return input;
-            }
-
-            if (inputMappings.TryGetValue(name, out input))
-            {
-                return input;
-            }
-
-            Debug.LogError($"InputMapping is not exist key {name}");
-            return null;
-        }
-
-        private string GetInputDeviceMapping(InputMapping input, InputDevice device)
-        {
-            switch (inputDevice)
-            {
-                case InputDevice.MouseKeyboard:
-                    return input.keyboard;
-                case InputDevice.XboxGamepad:
-                    return input.xbox;
-                case InputDevice.Ps4Gamepad:
-                    return input.ps4;
-                case InputDevice.Mobile:
-                    return input.mobile;
-                default:
-                    return input.keyboard;
-            }
-        }
-
-        private void SetInputDeviceMapping(InputMapping input, InputDevice device, string value)
-        {
-            switch (inputDevice)
-            {
-                case InputDevice.MouseKeyboard:
-                    input.keyboard = value;
-                    break;
-                case InputDevice.XboxGamepad:
-                    input.xbox = value;
-                    break;
-                case InputDevice.Ps4Gamepad:
-                    input.ps4 = value;
-                    break;
-                case InputDevice.Mobile:
-                    input.mobile = value;
-                    break;
-            }
-        }
-
-        private void SetInputDeviceMapping(InputMapping input, InputDevice device, InputMapping value)
-        {
-            switch (inputDevice)
-            {
-                case InputDevice.MouseKeyboard:
-                    input.keyboard = value.keyboard;
-                    break;
-                case InputDevice.XboxGamepad:
-                    input.xbox = value.xbox;
-                    break;
-                case InputDevice.Ps4Gamepad:
-                    input.ps4 = value.ps4;
-                    break;
-                case InputDevice.Mobile:
-                    input.mobile = value.mobile;
-                    break;
             }
         }
 
@@ -464,54 +419,26 @@ namespace UD.Services.InputSystem
 
         private bool IsJoystickInput()
         {
-            if (Input.GetKey(KeyCode.Joystick1Button0) ||
-                Input.GetKey(KeyCode.Joystick1Button1) ||
-                Input.GetKey(KeyCode.Joystick1Button2) ||
-                Input.GetKey(KeyCode.Joystick1Button3) ||
-                Input.GetKey(KeyCode.Joystick1Button4) ||
-                Input.GetKey(KeyCode.Joystick1Button5) ||
-                Input.GetKey(KeyCode.Joystick1Button6) ||
-                Input.GetKey(KeyCode.Joystick1Button7) ||
-                Input.GetKey(KeyCode.Joystick1Button8) ||
-                Input.GetKey(KeyCode.Joystick1Button9) ||
-                Input.GetKey(KeyCode.Joystick1Button10) ||
-                Input.GetKey(KeyCode.Joystick1Button11) ||
-                Input.GetKey(KeyCode.Joystick1Button12) ||
-                Input.GetKey(KeyCode.Joystick1Button13) ||
-                Input.GetKey(KeyCode.Joystick1Button14) ||
-                Input.GetKey(KeyCode.Joystick1Button15) ||
-                Input.GetKey(KeyCode.Joystick1Button16) ||
-                Input.GetKey(KeyCode.Joystick1Button17) ||
-                Input.GetKey(KeyCode.Joystick1Button18) ||
-                Input.GetKey(KeyCode.Joystick1Button19))
+            for (int i = 0; i < joystickButtons.Count; i++)
             {
-                return true;
-            }
-
-            if (Input.GetAxis("x axis") != 0.0f ||
-                Input.GetAxis("y axis") != 0.0f ||
-                Input.GetAxis("3rd axis") != 0.0f ||
-                Input.GetAxis("6th axis") != 0.0f ||
-                Input.GetAxis("7th axis") != 0.0f ||
-                Input.GetAxis("8th axis") != 0.0f ||
-                Input.GetAxis("9th axis") != 0.0f ||
-                Input.GetAxis("10th axis") != 0.0f)
-            {
-                return true;
-            }
-
-            if (IsPs4Device() && isForce)
-            {
-                if (Input.GetAxis("4th axis") > -1.0f ||
-                    Input.GetAxis("5th axis") > -1.0f)
+                var button = joystickButtons[i];
+                if (Input.GetKey(button))
                 {
                     return true;
                 }
             }
-            else
+
+            for (int i = 0; i < joystickAxes.Count; i++)
             {
-                if (Input.GetAxis("4th axis") != 0.0f ||
-                    Input.GetAxis("5th axis") != 0.0f)
+                var axis = joystickAxes[i];
+                if ((i == 3 || i == 4) && IsPs4Device() && isForce)
+                {
+                    if (Input.GetAxis(axis) > -1.0f)
+                    {
+                        return true;
+                    }
+                }
+                else if (Input.GetAxis(axis) != 0.0f)
                 {
                     return true;
                 }
@@ -554,64 +481,78 @@ namespace UD.Services.InputSystem
             return false;
         }
 
-        private string GetMouseKeyboard()
+        private void UpdateMouseKeyboard()
         {
             if (Event.current.isKey && Event.current.keyCode != KeyCode.None)
             {
-                inputKey = Event.current.ToString();
+                inputName = Event.current.keyCode.ToString();
+                inputAxis = 0.0f;
+                return;
             }
 
             for (int i = 0; i < 3; i++)
             {
                 if (Input.GetMouseButtonDown(i))
                 {
-                    inputKey = string.Concat("Mouse ", i);
+                    inputName = string.Concat("Mouse ", i);
+                    inputAxis = 0.0f;
+                    return;
                 }
             }
 
-            return null;
+            inputName = null;
+            inputAxis = 0.0f;
         }
 
-        //private string GetJoystickInput()
-        //{
-        //    if (Input.GetKey(KeyCode.Joystick1Button0) ||
-        //        Input.GetKey(KeyCode.Joystick1Button1) ||
-        //        Input.GetKey(KeyCode.Joystick1Button2) ||
-        //        Input.GetKey(KeyCode.Joystick1Button3) ||
-        //        Input.GetKey(KeyCode.Joystick1Button4) ||
-        //        Input.GetKey(KeyCode.Joystick1Button5) ||
-        //        Input.GetKey(KeyCode.Joystick1Button6) ||
-        //        Input.GetKey(KeyCode.Joystick1Button7) ||
-        //        Input.GetKey(KeyCode.Joystick1Button8) ||
-        //        Input.GetKey(KeyCode.Joystick1Button9) ||
-        //        Input.GetKey(KeyCode.Joystick1Button10) ||
-        //        Input.GetKey(KeyCode.Joystick1Button11) ||
-        //        Input.GetKey(KeyCode.Joystick1Button12) ||
-        //        Input.GetKey(KeyCode.Joystick1Button13) ||
-        //        Input.GetKey(KeyCode.Joystick1Button14) ||
-        //        Input.GetKey(KeyCode.Joystick1Button15) ||
-        //        Input.GetKey(KeyCode.Joystick1Button16) ||
-        //        Input.GetKey(KeyCode.Joystick1Button17) ||
-        //        Input.GetKey(KeyCode.Joystick1Button18) ||
-        //        Input.GetKey(KeyCode.Joystick1Button19))
-        //    {
-        //        return true;
-        //    }
+        private void UpdateJoystickInput()
+        {
+            for (int i = 0; i < joystickButtons.Count; i++)
+            {
+                var button = joystickButtons[i];
+                if (Input.GetKeyDown(button))
+                {
+                    var joystick = inputData.GetJoystickMapping(button.ToString());
+                    if (joystick != null)
+                    {
+                        inputName = IsPs4Device() ? joystick.ps4 : joystick.xbox;
+                        inputAxis = 0.0f;
+                        return;
+                    }
+                }
+            }
 
-        //    if (Input.GetAxis("x axis") != 0.0f ||
-        //        Input.GetAxis("y axis") != 0.0f ||
-        //        Input.GetAxis("3rd axis") != 0.0f ||
-        //        Input.GetAxis("6th axis") != 0.0f ||
-        //        Input.GetAxis("7th axis") != 0.0f ||
-        //        Input.GetAxis("8th axis") != 0.0f ||
-        //        Input.GetAxis("9th axis") != 0.0f ||
-        //        Input.GetAxis("10th axis") != 0.0f)
-        //    {
-        //        return true;
-        //    }
+            for (int i = 0; i < joystickAxes.Count; i++)
+            {
+                var axis = joystickAxes[i];
+                var axisValue = Input.GetAxis(axis);
+                if ((i == 3 || i == 4) && IsPs4Device() && isForce)
+                {
+                    if (axisValue > -1.0f)
+                    {
+                        var joystick = inputData.GetJoystickMapping(axis);
+                        if (joystick != null)
+                        {
+                            inputName = joystick.ps4;
+                            inputAxis = 1.0f;
+                            return;
+                        }
+                    }
+                }
+                else if (axisValue != 0.0f)
+                {
+                    var joystick = inputData.GetJoystickMapping(axis);
+                    if (joystick != null)
+                    {
+                        inputName = IsPs4Device() ? joystick.ps4 : joystick.xbox;
+                        inputAxis = axisValue;
+                        return;
+                    }
+                }
+            }
 
-        //    return null;
-        //}
+            inputName = null;
+            inputAxis = 0.0f;
+        }
     }
 
     public enum InputDevice
@@ -620,14 +561,5 @@ namespace UD.Services.InputSystem
         XboxGamepad,
         Ps4Gamepad,
         Mobile,
-    }
-
-    public class InputMapping
-    {
-        public string buttonName;
-        public string keyboard;
-        public string xbox;
-        public string ps4;
-        public string mobile;
     }
 }

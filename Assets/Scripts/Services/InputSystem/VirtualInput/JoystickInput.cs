@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace UD.Services.InputSystem
@@ -7,7 +6,6 @@ namespace UD.Services.InputSystem
     public class JoystickInput : VirtualInput
     {
         private Dictionary<string, UsedButton> usedButtons = new Dictionary<string, UsedButton>(8);
-        protected static Dictionary<string, JoystickMapping> joystickMappings = new Dictionary<string, JoystickMapping>(32);
 
         public override float GetAxis(InputMapping input)
         {
@@ -47,6 +45,11 @@ namespace UD.Services.InputSystem
         public override void SetButtonUp(string name)
         {
             Debug.LogError($"This button up '{name}' is not possible to be called for standalone input");
+        }
+
+        public override string GetButtonMapping(InputMapping input)
+        {
+            return null;
         }
 
         protected float GetAxis(string name, bool isInvert = false)
@@ -139,50 +142,13 @@ namespace UD.Services.InputSystem
             return Input.GetButtonUp(name);
         }
 
-        protected void CollectJoystickMapping()
-        {
-            if (joystickMappings.Count > 0)
-            {
-                return;
-            }
-
-            var textAsset = Resources.Load<TextAsset>("JoystickMapping");
-            if (!textAsset)
-            {
-                Debug.LogError("Resources dont exist InputMapping");
-            }
-            else
-            {
-                var lines = textAsset.text.Split(new[]
-                {
-                    "\r\n",
-                    "\n"
-                }, StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 3; i < lines.Length; i++)
-                {
-                    var column = lines[i].Split('\t');
-                    var mapping = new JoystickMapping()
-                    {
-                        joystick = column[0],
-                        xbox = column[1],
-                        ps4 = column[2],
-                        isAxis = byte.Parse(column[3]) > 0,
-                        isInvert = byte.Parse(column[4]) > 0
-                    };
-
-                    joystickMappings.Add(mapping.joystick, mapping);
-                }
-            }
-        }
-
         private UsedButton GetUsedButton(string name)
         {
             if (!usedButtons.TryGetValue(name, out var button))
             {
                 button = new UsedButton()
                 {
-                    name = name
+                    buttonName = name
                 };
 
                 usedButtons.Add(name, button);
@@ -193,18 +159,9 @@ namespace UD.Services.InputSystem
 
         private class UsedButton
         {
-            public string name;
+            public string buttonName;
             public bool isUsedDown;
             public bool isUsedUp;
-        }
-
-        protected class JoystickMapping
-        {
-            public string joystick;
-            public string xbox;
-            public string ps4;
-            public bool isAxis;
-            public bool isInvert;
         }
     }
 }

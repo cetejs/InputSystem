@@ -21,13 +21,13 @@ namespace UD.Services.Bullets
             {
                 bullet = bullets.Pop();
                 bullet.gameObject.SetActive(true);
+                bullet.transform.SetParent(null);
             }
             else
             {
                 bullet = Instantiate(bulletPrefab);
             }
 
-            bullet.transform.SetParent(null);
             return bullet;
         }
 

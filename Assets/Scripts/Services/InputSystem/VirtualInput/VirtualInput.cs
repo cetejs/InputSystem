@@ -24,6 +24,8 @@ namespace UD.Services.InputSystem
 
         public abstract void SetButtonUp(string name);
 
+        public abstract string GetButtonMapping(InputMapping input);
+
         protected KeyCode ConvertToKeyCode(string name)
         {
             if (keyCodes.TryGetValue(name, out var keyCode))

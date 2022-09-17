@@ -15,13 +15,13 @@ namespace UD.Services.InputSystem
         private void Awake()
         {
             scrollbar = GetComponent<Scrollbar>();
-            scrollbar.value = (Global.GetService<InputManager>().GetAxis(axisName) + 1) / 2;
+            scrollbar.value = (Global.GetService<InputManager>().GetAxis(axisName) + 1.0f) / 2.0f;
             scrollbar.onValueChanged.AddListener(OnValueChanged);
         }
 
         private void OnValueChanged(float value)
         {
-            Global.GetService<InputManager>().SetAxis(axisName, value * 2 - 1);
+            Global.GetService<InputManager>().SetAxis(axisName, value * 2.0f - 1.0f);
         }
     }
 }

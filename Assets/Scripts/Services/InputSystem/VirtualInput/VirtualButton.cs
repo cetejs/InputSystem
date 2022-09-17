@@ -4,17 +4,14 @@ namespace UD.Services.InputSystem
 {
     public class VirtualButton
     {
+        private string name;
         private int lastPressedFrame = -1;
         private int releasedFrame = -1;
         private bool isPressed;
 
-        public string Name { get; }
-
         public VirtualButton(string name)
         {
-            Name = name;
-            lastPressedFrame = -1;
-            releasedFrame = -1;
+            this.name = name;
         }
 
         public void Pressed()

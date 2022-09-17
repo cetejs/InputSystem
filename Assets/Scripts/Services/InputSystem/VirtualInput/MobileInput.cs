@@ -47,6 +47,11 @@ namespace UD.Services.InputSystem
             GetVirtualButton(name).Released();
         }
 
+        public override string GetButtonMapping(InputMapping input)
+        {
+            return string.IsNullOrEmpty(input.mobile) ? input.buttonName : input.mobile;
+        }
+
         private VirtualAxis GetVirtualAxis(InputMapping input)
         {
             var name = string.IsNullOrEmpty(input.mobile) ? input.buttonName : input.mobile;

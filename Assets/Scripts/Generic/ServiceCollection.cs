@@ -51,7 +51,7 @@ namespace UD.Generic
             services.Add(key, service);
             return (T) service;
         }
-        
+
         public Service AddService(Transform parent, Type type)
         {
             var key = type;
@@ -73,7 +73,7 @@ namespace UD.Generic
             services.Add(key, service);
             return service;
         }
-        
+
         public void AddService(Transform parent, Service instance)
         {
             if (!instance)
@@ -126,7 +126,7 @@ namespace UD.Generic
             {
                 services.Remove(key);
             }
-            
+
             invalidServers.Clear();
         }
 
@@ -136,7 +136,7 @@ namespace UD.Generic
             {
                 Object.Destroy(service);
             }
-        
+
             services.Clear();
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using UD.Globals;
 using UD.Services.Bullets;
 using UD.Services.InputSystem;
@@ -41,6 +42,13 @@ namespace UD.Controllers
         {
             cc = GetComponent<CharacterController>();
             cam = Camera.main.transform;
+        }
+
+        private void OnDisable()
+        {
+            isJumpDown = false;
+            isSpringing = false;
+            isShooting = false;
         }
 
         private void Update()
@@ -157,7 +165,7 @@ namespace UD.Controllers
 
                 shootCounter = shootInterval;
                 var bullet = Global.GetService<BulletManager>().GetBullet();
-                bullet.transform.position = muzzle.transform.position;
+                bullet.transform.position = muzzle.position;
                 bullet.transform.rotation = Quaternion.identity;
                 bullet.AddForce(transform.forward * bulletForce);
             }
